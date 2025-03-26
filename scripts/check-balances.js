@@ -15,62 +15,33 @@ async function main() {
     const TWGToken = await ethers.getContractFactory("TWGToken");
     const token = await TWGToken.attach(contractAddress);
     
-    // Get token info
+    // Token info
     const name = await token.name();
     const symbol = await token.symbol();
     const decimals = await token.decimals();
     const totalSupply = await token.totalSupply();
-    const owner = await token.owner();
     
-    console.log("\n=== TOKEN INFORMATION ===");
-    console.log(`Name: ${name}`);
-    console.log(`Symbol: ${symbol}`);
-    console.log(`Decimals: ${decimals}`);
-    console.log(`Total Supply: ${ethers.utils.formatUnits(totalSupply, decimals)} ${symbol}`);
-    console.log(`Owner: ${owner}`);
+    console.log(`\nToken Info:`);
+    console.log(`- Name: ${name}`);
+    console.log(`- Symbol: ${symbol}`);
+    console.log(`- Decimals: ${decimals}`);
+    console.log(`- Total Supply: ${ethers.utils.formatUnits(totalSupply, decimals)} ${symbol}`);
     
-    // Check balances
-    console.log("\n=== KEY BALANCES ===");
+    // Check important balances
+    const addresses = [
+      { name: "Contract", address: contractAddress },
+      { name: "Your Address", address: deployer.address },
+      { name: "Target Address", address: "0x94efDe2cf44cDCF2120F303593DAec002E44ee11" },
+    ];
     
-    // Contract balance
-    const contractBalance = await token.balanceOf(contractAddress);
-    console.log(`Contract Balance: ${ethers.utils.formatUnits(contractBalance, decimals)} ${symbol}`);
-    
-    // Deployer balance
-    const deployerBalance = await token.balanceOf(deployer.address);
-    console.log(`Deployer Balance: ${ethers.utils.formatUnits(deployerBalance, decimals)} ${symbol}`);
-    
-    // Owner balance (if different from deployer)
-    if (owner.toLowerCase() !== deployer.address.toLowerCase()) {
-      const ownerBalance = await token.balanceOf(owner);
-      console.log(`Owner Balance: ${ethers.utils.formatUnits(ownerBalance, decimals)} ${symbol}`);
-    }
-    
-    // Check who has most of the tokens
-    const percentInContract = contractBalance.mul(100).div(totalSupply);
-    const percentInDeployer = deployerBalance.mul(100).div(totalSupply);
-    
-    console.log(`\nPercentage of tokens in contract: ${percentInContract.toString()}%`);
-    console.log(`Percentage of tokens in deployer account: ${percentInDeployer.toString()}%`);
-    
-    // Calculate remaining tokens
-    const remainingPercent = ethers.BigNumber.from(100).sub(percentInContract).sub(percentInDeployer);
-    console.log(`Percentage of tokens distributed elsewhere: ${remainingPercent.toString()}%`);
-    
-    // Check for approval to move tokens if needed
-    if (contractBalance.gt(0)) {
-      console.log("\nContract has tokens directly in its balance. Use token.transfer() for distribution.");
-    } else if (deployerBalance.gt(0)) {
-      const allowance = await token.allowance(deployer.address, contractAddress);
-      console.log(`\nDeployer → Contract Allowance: ${ethers.utils.formatUnits(allowance, decimals)} ${symbol}`);
-      
-      if (allowance.lt(deployerBalance)) {
-        console.log("Consider approving the contract to spend your tokens if transferFrom will be used.");
-      }
+    console.log(`\nAccount Balances:`);
+    for (const item of addresses) {
+      const balance = await token.balanceOf(item.address);
+      console.log(`- ${item.name} (${item.address}): ${ethers.utils.formatUnits(balance, decimals)} ${symbol}`);
     }
     
   } catch (error) {
-    console.error("Error checking balances:", error);
+    console.error("Error in balance check script:", error);
   }
 }
 

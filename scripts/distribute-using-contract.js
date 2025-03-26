@@ -7,7 +7,7 @@ async function main() {
     // Contract address for the deployed TWGToken
     const contractAddress = "0x6EB64894CFb6a7d00749781aD01975584822dD5F";
     
-    // Get the signer (must be the contract owner)
+    // Get the signer
     const [deployer] = await ethers.getSigners();
     console.log(`Deployer address: ${deployer.address}`);
     
@@ -15,14 +15,8 @@ async function main() {
     const TWGToken = await ethers.getContractFactory("TWGToken");
     const token = await TWGToken.attach(contractAddress);
     
-    // Verify ownership
-    const owner = await token.owner();
-    console.log(`Contract owner address: ${owner}`);
-    
-    if (owner.toLowerCase() !== deployer.address.toLowerCase()) {
-      console.error("The signer is not the contract owner. Cannot distribute tokens.");
-      return;
-    }
+    // Skip ownership check since ownership has been renounced
+    console.log(`Contract ownership has been renounced. Proceeding with distribution...`);
 
     // Token info
     const name = await token.name();
@@ -39,8 +33,7 @@ async function main() {
     
     // Define addresses to distribute to (just a few for testing)
     const addressesToDistribute = [
-      
-      { address: "0x94efDe2cf44cDCF2120F303593DAec002E44ee11", amount: "899940280", category: "MIGRATOR", vesting: "" },
+      { address: "0x94efDe2cf44cDCF2120F303593DAec002E44ee11", amount: "16000000", category: "MIGRATOR", vesting: "" },
     ];
     
     // Prepare arrays for the distributeTokens function
