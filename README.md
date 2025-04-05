@@ -1,4 +1,4 @@
-# The Wally Group Token (TWG)
+# The Wally Group Token (TWG)$
 
 A secure ERC-20 token implementation with vesting, transaction limits, and early tax mechanisms.
 
